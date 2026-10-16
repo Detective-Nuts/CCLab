@@ -202,7 +202,7 @@ function drawBackground() {
             bubbleRadius[i] += bubbleSpeed[i];
         }
 
-        if (bubbleRadius[i] >= 1500) {
+        if (bubbleRadius[i] >= 1600) {
             xPos[i] = random(0, width);
             yPos[i] = random(0, height);
             bubbleSpeed[i] = random(1, 10);
