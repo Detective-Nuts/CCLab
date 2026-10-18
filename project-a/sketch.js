@@ -41,13 +41,13 @@ let tailRadius = [];
 let isSpawned = false;
 let wasPressed = false;
 
-let Chomp;
+// let Chomp;
 
 
-async function setup() {
+function setup() {
     createCanvas(800, 500);
 
-    Chomp = await loadSound('Chomp.mp3');
+    // Chomp = await loadSound('Chomp.mp3');
 
     ballColor = color("black");
     targetColor = color("black");
