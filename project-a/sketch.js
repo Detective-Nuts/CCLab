@@ -4,15 +4,19 @@ let targetX = 400,
     targetY = 250;
 let mousex = targetX,
     mousey = targetY;
-let r1, g1, b1, r2, g2, b2;
 let from, to;
 let spawnX = 0,
     spawnY = 0;
 
-let ballSize = 20;
+
+let ballSize = 105;
+let ballColor;
+let targetColor;
+let targetChangeColor;
 let foodType;
 let tailNumber = 6;
 let foodSize = 5;
+let Happiness = 0;
 
 let roamAngle = 0,
     roamRadius = 200;
@@ -37,8 +41,21 @@ let tailRadius = [];
 let isSpawned = false;
 let wasPressed = false;
 
-function setup() {
+let Chomp;
+
+
+async function setup() {
     createCanvas(800, 500);
+
+    Chomp = await loadSound('Chomp.mp3');
+
+    ballColor = color("black");
+    targetColor = color("black");
+    targetChangeColor = color("black");
+
+
+
+
 
     for (i = 0; i < bubbleNum; i++) {
         xPos[i] = random(0, width);
@@ -48,10 +65,8 @@ function setup() {
         bubbleSpeed[i] = random(1, 10);
     }
 
-
-
     background(200);
-    foodType = "Big";
+    foodType = "Angry";
 
     // 2) let's initiate them!
     for (let i = 0; i < tailNumber; i++) {
@@ -64,9 +79,7 @@ function setup() {
 function draw() {
     drawBackground();
     roamAngle += 0.01;
-
-    from = color(r1, g1, b1);
-    to = color(r2, g2, b2);
+    Keyboard();
     // x+= xSpeed;
     let y = 30 * sin(frameCount * 0.1) + targetY;
 
@@ -80,24 +93,7 @@ function draw() {
     roamX = width / 2 + cos(roamAngle) * roamRadius;
     roamY = height / 2 + sin(roamAngle) * roamRadius;
 
-    // Draw the point.
-    // if (y >= 709.9) {
-    //   r1 = random(0, 255);
-    //   g1 = random(0, 255);
-    //   b1 = random(0, 255);
-    // }
-    // if (y <= 20.1) {
-    //   r2 = random(0, 255);
-    //   g2 = random(0, 255);
-    //   b2 = random(0, 255);
-    // }
-    r1 = map(targetX, 0, width, 0, 255);
-    g1 = map(targetY, 0, height, 0, 255);
-    b1 = map(targetX - targetY, 0, width - height, 0, 255)
-    let ballColor = color(r1, g1, b1);
 
-
-    //fill(ballColor)
 
     if (mouseIsPressed && !wasPressed && !isSpawned) {
         isSpawned = true;
@@ -121,46 +117,55 @@ function draw() {
     }
 
     drawTail(targetX, targetY);
-    drawCreature(targetX, targetY, ballSize, ballColor, 255);
+    drawCreature(targetX, targetY, ballSize, ballColor);
 
     if (dist(targetX, targetY, spawnX, spawnY) <= ballSize / 2 + foodSize / 2) {
-        eatFood(foodType);
+        eatFood(foodType, ballColor);
         isSpawned = false;
     }
 
     if (!mouseIsPressed && !isSpawned) {
         wasPressed = false;
     }
+    ballColor = lerpColor(ballColor, targetChangeColor, 0.02);
+
 }
+
+
 
 function createFood(x, y, foodSize, color) {
     circle(x, y, foodSize);
 }
 
-function drawCreature(x, y, size, color) {
-    //console.log(targetX)
-    fill(color)
+function drawCreature(x, y, size, colors) {
+    fill(colors);
     circle(x, y, size);
     noStroke;
 }
 
-function eatFood(typeofFood) {
+function eatFood(typeofFood, creatureColor) {
     if (isSpawned) {
-        if (typeofFood == "Big") {
+        targetChangeColor = lerpColor(ballColor, targetColor, 0.6);
+        Chomp.play();
+        if (typeofFood == "Happy") {
             ballSize += 5;
         }
-        if (typeofFood == "Red") {
-            r += 5;
+        if (typeofFood == "Angry") {
+            targetColor = color("red");
+        }
+        if (typeofFood == "Fear") {
+            targetColor = color("orange");
+        }
+        if (typeofFood == "Sad") {
+            targetColor = color("blue");
         }
         if (typeofFood == "small") {
-
         }
     }
 }
 
 ///honestly might import this directly into the creature itself but I'm worried so I'm going to encapsulate it
 function drawTail(x, y, ballRadius) {
-
     // 3) Finally, we can use them properly!
     for (let i = 0; i < tailNumber; i++) {
         if (i == 0) {
@@ -196,8 +201,6 @@ function drawBackground() {
         noFill();
         bubbleTimer[i]++;
 
-
-
         if (bubbleTimer[i] > 15 * 60) {
             bubbleRadius[i] += bubbleSpeed[i];
         }
@@ -214,14 +217,30 @@ function drawBackground() {
     }
 }
 
-function changeColor(col, targetCol) {
-    lerp(col, targetCol, 0.02)
+function evolve() {
+    if (ballSize >= 105) {
+        lerp(ballSize, 130, 0.05)
+
+        if (Happiness >= 10) {
+
+        }
+        else if (Happiness < 10) {
+
+        }
+
+
+    }
 }
 
+function Keyboard() {
+    if (key === '1') { foodType = "Happy" }
+    if (key === '2') { foodType = "Angry" }
+    if (key === '3') { foodType = "Sad" }
+    if (key === '4') { foodType = "Fear" }
+    if (key === '5') { foodType = "Love" }
+}
 
-
-
-
+// make rainbow function that cycles color cuz it sounds fun (that map() stuff you did with target positions to make it rainbowy)
 
 //what you need to do is get whatever the target x is for every second. the ball needs to then lerp to THAT target x and then you need to repeat and count the time for whatever that balls target x was and find its time.
 
@@ -230,3 +249,9 @@ function changeColor(col, targetCol) {
 // alr now we just need to cause it so that the size is directly proportional to the lerp speed of the tail aka bigger creature slower tail lerp.
 
 // MAKE BOOLEAN TO SPWAN IN FOOD AND ADD COUNTER THING SO IT ONLY SPWANS IN ONE WHEN YOU PRESS MOUSE #youaresooooooosmartdudeB)
+
+
+
+
+
+//// add metamorphasis (need to find face rig)
