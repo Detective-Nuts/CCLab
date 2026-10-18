@@ -41,13 +41,13 @@ let tailRadius = [];
 let isSpawned = false;
 let wasPressed = false;
 
-// let Chomp;
+let Chomp;
 
 
-function setup() {
+async function setup() {
     createCanvas(800, 500);
 
-    // Chomp = await loadSound('Chomp.mp3');
+    Chomp = await loadSound('Chomp.mp3');
 
     ballColor = color("black");
     targetColor = color("black");
@@ -146,7 +146,7 @@ function drawCreature(x, y, size, colors) {
 function eatFood(typeofFood, creatureColor) {
     if (isSpawned) {
         targetChangeColor = lerpColor(ballColor, targetColor, 0.6);
-        //Chomp.play();
+        Chomp.play();
         if (typeofFood == "Happy") {
             ballSize += 5;
         }
