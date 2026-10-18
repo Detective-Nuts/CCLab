@@ -146,7 +146,7 @@ function drawCreature(x, y, size, colors) {
 function eatFood(typeofFood, creatureColor) {
     if (isSpawned) {
         targetChangeColor = lerpColor(ballColor, targetColor, 0.6);
-        Chomp.play();
+        //Chomp.play();
         if (typeofFood == "Happy") {
             ballSize += 5;
         }
