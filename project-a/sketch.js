@@ -8,15 +8,21 @@ let from, to;
 let spawnX = 0,
     spawnY = 0;
 
+let evolved = false;
 
-let ballSize = 105;
+let ballSize = 50;
 let ballColor;
 let targetColor;
 let targetChangeColor;
 let foodType;
 let tailNumber = 6;
 let foodSize = 5;
+
 let Happiness = 0;
+let Angriness = 0;
+let Sadness = 0;
+let Fearfullness = 0;
+let Loveness = 0;
 
 let roamAngle = 0,
     roamRadius = 200;
@@ -41,21 +47,16 @@ let tailRadius = [];
 let isSpawned = false;
 let wasPressed = false;
 
-// let Chomp;
-
+//let Chomp;
 
 function setup() {
     createCanvas(800, 500);
 
-    // Chomp = await loadSound('Chomp.mp3');
+    // Chomp = await loadSound("Chomp.mp3");
 
     ballColor = color("black");
     targetColor = color("black");
     targetChangeColor = color("black");
-
-
-
-
 
     for (i = 0; i < bubbleNum; i++) {
         xPos[i] = random(0, width);
@@ -93,8 +94,6 @@ function draw() {
     roamX = width / 2 + cos(roamAngle) * roamRadius;
     roamY = height / 2 + sin(roamAngle) * roamRadius;
 
-
-
     if (mouseIsPressed && !wasPressed && !isSpawned) {
         isSpawned = true;
         spawnY = mouseY;
@@ -118,7 +117,8 @@ function draw() {
 
     drawTail(targetX, targetY);
     drawCreature(targetX, targetY, ballSize, ballColor);
-
+    evolve();
+    1;
     if (dist(targetX, targetY, spawnX, spawnY) <= ballSize / 2 + foodSize / 2) {
         eatFood(foodType, ballColor);
         isSpawned = false;
@@ -128,10 +128,7 @@ function draw() {
         wasPressed = false;
     }
     ballColor = lerpColor(ballColor, targetChangeColor, 0.02);
-
 }
-
-
 
 function createFood(x, y, foodSize, color) {
     circle(x, y, foodSize);
@@ -144,9 +141,9 @@ function drawCreature(x, y, size, colors) {
 }
 
 function eatFood(typeofFood, creatureColor) {
-    if (isSpawned) {
+    if (isSpawned && !evolved) {
         targetChangeColor = lerpColor(ballColor, targetColor, 0.6);
-        //Chomp.play();
+        // Chomp.play();
         if (typeofFood == "Happy") {
             ballSize += 5;
         }
@@ -158,6 +155,9 @@ function eatFood(typeofFood, creatureColor) {
         }
         if (typeofFood == "Sad") {
             targetColor = color("blue");
+        }
+        if (typeofFood == "Love") {
+            targetColor = color("pink");
         }
         if (typeofFood == "small") {
         }
@@ -219,25 +219,88 @@ function drawBackground() {
 
 function evolve() {
     if (ballSize >= 105) {
-        lerp(ballSize, 130, 0.05)
+        fill(255);
+        evolved = true;
+        ballSize = lerp(ballSize, 150, 0.05);
 
-        if (Happiness >= 10) {
-
+        if (
+            Happiness > Angriness + 5 &&
+            Happiness > Sadness + 5 &&
+            Happiness > Fearfullness + 5 &&
+            Happiness > Loveness + 5
+        ) {
+            arc(targetX, targetY + 30, 30, 30, radians(0), radians(180));
         }
-        else if (Happiness < 10) {
-
+        if (
+            Angriness > Happiness + 5 &&
+            Angriness > Sadness + 5 &&
+            Angriness > Fearfullness + 5 &&
+            Angriness > Loveness + 5
+        ) {
+            arc(targetX, targetY + 30, 30, 30, radians(180), radians(360));
+        }
+        if (
+            Sadness > Happiness + 5 &&
+            Sadness > Angriness + 5 &&
+            Sadness > Fearfullness + 5 &&
+            Sadness > Loveness + 5
+        ) {
+            arc(targetX, targetY + 30, 30, 30, radians(180), radians(360));
         }
 
+        if (
+            Fearfullness > Happiness + 5 &&
+            Fearfullness > Angriness + 5 &&
+            Fearfullness > Sadness + 5 &&
+            Fearfullness > Loveness + 5
+        ) {
+            arc(targetX, targetY + 30, 30, 30, radians(0), radians(360));
+        }
+        if (
+            Loveness > Happiness + 5 &&
+            Loveness > Angriness + 5 &&
+            Loveness > Sadness + 5 &&
+            Loveness > Fearfullness + 5
+        ) {
+            arc(targetX, targetY + 30, 30, 30, radians(0), radians(180));
+        } else {
+            ellipse(targetX - 30, targetY, 60, 30);
+            ellipse(targetX + 30, targetY, 60, 30);
+            arc(targetX, targetY + 30, 30, 30, radians(180), radians(360));
+        }
 
+        // sad  // arc(targetX, targetY + 30, 30, 30, radians(180), radians(360));
+        // happy //        arc(targetX, targetY + 30, 30, 30, radians(0), radians(180));
+        //shocked    //arc(targetX, targetY + 30, 30, 30, radians(0), radians(360));
     }
 }
 
 function Keyboard() {
-    if (key === '1') { foodType = "Happy" }
-    if (key === '2') { foodType = "Angry" }
-    if (key === '3') { foodType = "Sad" }
-    if (key === '4') { foodType = "Fear" }
-    if (key === '5') { foodType = "Love" }
+    if (key === "1") {
+        foodType = "Happy";
+    }
+    if (key === "2") {
+        foodType = "Angry";
+    }
+    if (key === "3") {
+        foodType = "Sad";
+    }
+    if (key === "4") {
+        foodType = "Fear";
+    }
+    if (key === "5") {
+        foodType = "Love";
+    }
+}
+``;
+
+function heart(x, y, size) {
+    beginShape();
+    fill("red");
+    vertex(x, y);
+    bezierVertex(x - size / 2, y - size / 2, x - size, y + size / 3, x, y + size);
+    bezierVertex(x + size, y + size / 3, x + size / 2, y - size / 2, x, y);
+    endShape(CLOSE);
 }
 
 // make rainbow function that cycles color cuz it sounds fun (that map() stuff you did with target positions to make it rainbowy)
@@ -250,8 +313,8 @@ function Keyboard() {
 
 // MAKE BOOLEAN TO SPWAN IN FOOD AND ADD COUNTER THING SO IT ONLY SPWANS IN ONE WHEN YOU PRESS MOUSE #youaresooooooosmartdudeB)
 
-
-
-
-
 //// add metamorphasis (need to find face rig)
+
+/// add background color change
+
+/// if we have time add different movement properties
