@@ -1,7 +1,7 @@
 let x = 0;
 let xSpeed = 1;
 let targetX = 400,
-    targetY = 250;
+    targetY = 10;
 let mousex = targetX,
     mousey = targetY;
 let from, to;
@@ -9,11 +9,17 @@ let spawnX = 0,
     spawnY = 0;
 
 let evolved = false;
+let corrupted = false;
+let evolvedoncejustforcolorsImmakingthisvariableextralongbecauseImSOOOOOOOOOOOOOMAD = false;
 
-let ballSize = 50;
+let ballSize = 40;
 let ballColor;
 let targetColor;
 let targetChangeColor;
+let backgroundColor;
+let backgroundTargetColor;
+let backgroundChangeColor;
+let spawnColor;
 let foodType;
 let tailNumber = 6;
 let foodSize = 5;
@@ -23,6 +29,7 @@ let Angriness = 0;
 let Sadness = 0;
 let Fearfullness = 0;
 let Loveness = 0;
+let Corruption = 0;
 
 let roamAngle = 0,
     roamRadius = 200;
@@ -51,12 +58,18 @@ let wasPressed = false;
 
 function setup() {
     createCanvas(800, 500);
+    angleMode(degrees);
 
     // Chomp = await loadSound("Chomp.mp3");
+
+    backgroundColor = color(90, 190, 255);
+    backgroundTargetColor = color(90, 190, 255);
+    backgroundChangeColor = color(90, 190, 255);
 
     ballColor = color("black");
     targetColor = color("black");
     targetChangeColor = color("black");
+    spawnColor = color("white");
 
     for (i = 0; i < bubbleNum; i++) {
         xPos[i] = random(0, width);
@@ -67,7 +80,7 @@ function setup() {
     }
 
     background(200);
-    foodType = "Angry";
+    foodType = "Happy";
 
     // 2) let's initiate them!
     for (let i = 0; i < tailNumber; i++) {
@@ -106,6 +119,7 @@ function draw() {
     // console.log(y)
 
     if (isSpawned) {
+        fill(spawnColor);
         circle(spawnX, spawnY, 5);
 
         targetX = lerp(targetX, spawnX, 0.02);
@@ -145,21 +159,34 @@ function eatFood(typeofFood, creatureColor) {
         targetChangeColor = lerpColor(ballColor, targetColor, 0.6);
         // Chomp.play();
         if (typeofFood == "Happy") {
+            targetColor = color("yellow");
             ballSize += 5;
+            Happiness++;
         }
         if (typeofFood == "Angry") {
             targetColor = color("red");
+            ballSize += 5;
+            Angriness++;
         }
         if (typeofFood == "Fear") {
             targetColor = color("orange");
+            ballSize += 5;
+            Fearfullness++;
         }
         if (typeofFood == "Sad") {
             targetColor = color("blue");
+            ballSize += 5;
+            Sadness++;
         }
         if (typeofFood == "Love") {
             targetColor = color("pink");
+            ballSize += 5;
+            Loveness++;
         }
-        if (typeofFood == "small") {
+        if (typeofFood == "Corruption") {
+            targetColor = color("Black");
+            ballSize += 5;
+            Corruption += 15;
         }
     }
 }
@@ -196,7 +223,17 @@ function drawBall(x, y, size, one, two, three) {
 }
 
 function drawBackground() {
-    background(90, 190, 255);
+    if (corrupted) {
+    } else if (!corrupted && evolved) {
+        backgroundColor = lerpColor(backgroundColor, backgroundTargetColor, 0.02);
+        background(backgroundColor);
+
+        //  ballColor = lerpColor(ballColor, targetChangeColor, 0.02);
+        //  targetChangeColor = lerpColor(ballColor, targetColor, 0.6);
+    } else {
+        background(backgroundColor);
+    }
+
     for (i = 0; i < bubbleNum; i++) {
         noFill();
         bubbleTimer[i]++;
@@ -224,49 +261,83 @@ function evolve() {
         ballSize = lerp(ballSize, 150, 0.05);
 
         if (
+            !evolvedoncejustforcolorsImmakingthisvariableextralongbecauseImSOOOOOOOOOOOOOMAD
+        ) {
+            backgroundTargetColor = lerpColor(backgroundTargetColor, ballColor, 0.83);
+            evolvedoncejustforcolorsImmakingthisvariableextralongbecauseImSOOOOOOOOOOOOOMAD = true;
+        }
+        if (
+            Corruption >= 20 &&
+            Angriness == 0 &&
+            Sadness == 0 &&
+            Fearfullness == 0 &&
+            Happiness == 0
+        ) {
+            corrupted = true;
+        }
+
+        if (
             Happiness > Angriness + 5 &&
             Happiness > Sadness + 5 &&
             Happiness > Fearfullness + 5 &&
             Happiness > Loveness + 5
         ) {
             arc(targetX, targetY + 30, 30, 30, radians(0), radians(180));
-        }
-        if (
+            eyeBrow(targetX - 30, targetY - 35, 30, 50);
+            eyeBrow(targetX + 30, targetY - 35, 30, 13);
+            circle(targetX - 30, targetY, 30);
+            circle(targetX + 30, targetY, 30);
+        } else if (
             Angriness > Happiness + 5 &&
             Angriness > Sadness + 5 &&
             Angriness > Fearfullness + 5 &&
             Angriness > Loveness + 5
         ) {
             arc(targetX, targetY + 30, 30, 30, radians(180), radians(360));
-        }
-        if (
+            fill(ballColor);
+            arc(targetX, targetY + 31, 15, 15, radians(180), radians(360));
+            fill(0);
+            eyeBrow(targetX - 30, targetY - 35, 30, 10);
+            eyeBrow(targetX + 30, targetY - 35, 30, 15);
+            circle(targetX - 30, targetY, 30);
+            circle(targetX + 30, targetY, 30);
+        } else if (
             Sadness > Happiness + 5 &&
             Sadness > Angriness + 5 &&
             Sadness > Fearfullness + 5 &&
             Sadness > Loveness + 5
         ) {
             arc(targetX, targetY + 30, 30, 30, radians(180), radians(360));
-        }
-
-        if (
+            fill(ballColor);
+            arc(targetX, targetY + 31, 15, 15, radians(180), radians(360));
+            fill(255);
+            eyeBrow(targetX - 30, targetY - 35, 30, 50);
+            eyeBrow(targetX + 30, targetY - 35, 30, 13);
+            circle(targetX - 30, targetY, 30);
+            circle(targetX + 30, targetY, 30);
+        } else if (
             Fearfullness > Happiness + 5 &&
             Fearfullness > Angriness + 5 &&
             Fearfullness > Sadness + 5 &&
             Fearfullness > Loveness + 5
         ) {
             arc(targetX, targetY + 30, 30, 30, radians(0), radians(360));
-        }
-        if (
+            eyeBrow(targetX - 30, targetY - 35, 30, 50);
+            eyeBrow(targetX + 30, targetY - 35, 30, 13);
+            circle(targetX - 30, targetY, 30);
+            circle(targetX + 30, targetY, 30);
+        } else if (
             Loveness > Happiness + 5 &&
             Loveness > Angriness + 5 &&
             Loveness > Sadness + 5 &&
             Loveness > Fearfullness + 5
         ) {
             arc(targetX, targetY + 30, 30, 30, radians(0), radians(180));
-        } else {
-            ellipse(targetX - 30, targetY, 60, 30);
-            ellipse(targetX + 30, targetY, 60, 30);
-            arc(targetX, targetY + 30, 30, 30, radians(180), radians(360));
+            heart(targetX - 30, targetY - 20, 25);
+            heart(targetX + 30, targetY - 20, 25);
+            eyeBrow(targetX - 30, targetY - 35, 30, 50);
+            eyeBrow(targetX + 30, targetY - 35, 30, 13);
+            // arc(targetX, targetY + 30, 30, 30, radians(180), radians(360));
         }
 
         // sad  // arc(targetX, targetY + 30, 30, 30, radians(180), radians(360));
@@ -278,29 +349,55 @@ function evolve() {
 function Keyboard() {
     if (key === "1") {
         foodType = "Happy";
+        spawnColor = color("yellow");
     }
     if (key === "2") {
         foodType = "Angry";
+        spawnColor = color("red");
     }
     if (key === "3") {
         foodType = "Sad";
+        spawnColor = color("blue");
     }
     if (key === "4") {
         foodType = "Fear";
+        spawnColor = color("orange");
     }
     if (key === "5") {
         foodType = "Love";
+        spawnColor = color("pink");
+    }
+    if (key === "6") {
+        foodType = "Corruption";
+        spawnColor = color("black");
     }
 }
-``;
-
 function heart(x, y, size) {
     beginShape();
-    fill("red");
-    vertex(x, y);
-    bezierVertex(x - size / 2, y - size / 2, x - size, y + size / 3, x, y + size);
-    bezierVertex(x + size, y + size / 3, x + size / 2, y - size / 2, x, y);
+    // fill("red");
+    bezierVertex(x, y);
+
+    bezierVertex(x - size / 2, y - size / 2);
+    bezierVertex(x - size, y + size / 3);
+    bezierVertex(x, y + size);
+
+    bezierVertex(x + size, y + size / 3);
+    bezierVertex(x + size / 2, y - size / 2);
+    bezierVertex(x, y);
     endShape(CLOSE);
+}
+
+function eyeBrow(x, y, size, rotation) {
+    push();
+
+    translate(x, y);
+
+    rotate(rotation);
+    rectMode(CENTER);
+    fill(255, 255, 255);
+    rect(0, 0, size, size - 25);
+
+    pop();
 }
 
 // make rainbow function that cycles color cuz it sounds fun (that map() stuff you did with target positions to make it rainbowy)
