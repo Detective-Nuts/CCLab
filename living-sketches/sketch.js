@@ -12,12 +12,12 @@ let idle = true;
 let idlestanding;
 
 async function setup() {
-  createCanvas(600, 600);
+  createCanvas(1920, 1080);
 
   //let allPromises = [];
 
   for (let i = 1; i <= 4; i++) {
-    let filename = "asset/man" + i + ".png";
+    let filename = "assets/man" + i + ".png";
     let onePromise = loadImage(filename);
     allPromises.push(onePromise);
   }
